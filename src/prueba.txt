@@ -1,0 +1,17 @@
+entero baseCalculo;
+real resultadoGlobal;
+
+funcion real calcularImpuesto() {
+    real tasa;
+    real subtotal;
+
+    tasa = 0.21;
+    subtotal = aReal(baseCalculo);
+    retornar subtotal * tasa;
+}
+
+principal {
+    baseCalculo = 500; 
+
+    resultadoGlobal = calcularImpuesto(); 
+} 
