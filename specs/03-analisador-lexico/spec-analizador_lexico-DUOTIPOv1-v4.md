@@ -1,9 +1,9 @@
-### Spec — Analizador léxico de DUOTIPO
+## Spec — Analizador léxico de DUOTIPO
 **Grupo:** E · **Lenguaje de implementación:** C · **Depende de:** specs/01-diseno/specDUOTIPO1.md · **Produce:** src/lexer.c/ · escribe en la tabla de símbolos definida en specs/02-tabla-simbolos/spec.md
 
 --------------------------------------------------------------------------------
 
-#### 1. Alcance e interfaz
+### 1. Alcance e interfaz
 Función `yylex()` invocada por el analizador sintáctico (GNU Bison). Devuelve **un token por llamada**, como entero representativo del tipo de token (constantes `TK_*` o códigos definidos por Bison). No genera una pasada previa que devuelva una lista de tokens; el flujo es guiado por demanda.
 
 ```c
@@ -12,7 +12,7 @@ int yylex(void);
 
 --------------------------------------------------------------------------------
 
-#### 2. Decisiones propias de esta fase
+### 2. Decisiones propias de esta fase
 
 | # | Decisión | Valor |
 |---|---|---|
@@ -25,7 +25,7 @@ int yylex(void);
 
 --------------------------------------------------------------------------------
 
-#### 3. Eventos (columnas de las matrices)
+### 3. Eventos (columnas de las matrices)
 
 La función auxiliar `get_evento(int c)` mapea el carácter leído del archivo fuente a un índice entero de columna (de 0 a 19):
 
@@ -54,15 +54,16 @@ La función auxiliar `get_evento(int c)` mapea el carácter leído del archivo f
 
 --------------------------------------------------------------------------------
 
-#### 4. Estados y Diagrama
+### 4. Estados y Diagrama
 
-## 4. Estados y Diagrama
-
+#### 4.1 Diagrama automata de DUOTIPO
 <img width="2691" height="1493" alt="AUTOMATA_COMPILADORES-DuoTipo v 4 drawio" src="https://github.com/user-attachments/assets/c8984f60-dc39-49d6-b46b-d777bca5dc32" />
 
 ---
+#### 4.2 Tabla de estado 
+
 <center>
-  
+ 
 | Estado | Significado |
 |---|---|
 | **E0** | Estado inicial; consume blancos o inicia el reconocimiento de tokens |
@@ -94,9 +95,7 @@ La función auxiliar `get_evento(int c)` mapea el carácter leído del archivo f
 </center>
 ---
 
---------------------------------------------------------------------------------
-
-#### 5. Matriz de Nuevos Estados (`nuevo_estado[24][20]`)
+### 5. Matriz de Nuevos Estados (`nuevo_estado[24][20]`)
 
 Valores: `0` a `23` para estados intermedios, `-1` para Estado Final de aceptación (`EF`).
 
@@ -128,7 +127,7 @@ Valores: `0` a `23` para estados intermedios, `-1` para Estado Final de aceptaci
 | `posible fin comentario` | **E23** | 22 | 22 | 22 | 22 | 22 | 23 | 0 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | -1 | 22 |
 
 ---
-#### 6. Acciones semánticas
+### 6. Acciones semánticas
 
 | Acción | Nombre de función | Qué hace |
 |:---:|:---:|:---|
@@ -144,7 +143,7 @@ Valores: `0` a `23` para estados intermedios, `-1` para Estado Final de aceptaci
 | **fe** | `f_error_lexico` | Registra y emite un mensaje de error léxico con número de línea actual y descripción del motivo. |
 
 
-#### 7. Matriz de Acciones Semánticas (`acciones[24][20]`)
+### 7. Matriz de Acciones Semánticas (`acciones[24][20]`)
 
 | Nombre de Estado | N° | LETRA (0) | DÍGITO (1) | = (2) | + (3) | - (4) | * (5) | / (6) | < (7) | > (8) | ! (9) | ( (10) | ) (11) | { (12) | } (13) | ; (14) | : (15) | . (16) | BLANCO (17) | FDA (18) | OTRO (19) |
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
@@ -175,7 +174,7 @@ Valores: `0` a `23` para estados intermedios, `-1` para Estado Final de aceptaci
 
 ---
 
-#### 8. Tabla de Unreads (`unreads[24][20]`)
+### 8. Tabla de Unreads (`unreads[24][20]`)
 
 Un valor `1` indica que se debe reinsertar el carácter leído en el buffer de entrada con `ungetc(c, yyin)`. Un valor `0` indica que el carácter pertenece al token o fue consumido normalmente.
 
@@ -207,14 +206,82 @@ Un valor `1` indica que se debe reinsertar el carácter leído en el buffer de e
 | `posible fin comentario` | **E23** | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 
 --------------------------------------------------------------------------------
-Tabla de Tokens:
-https://github.com/martinzwaryczz/compiladores-2026/blob/main/specs/01-
-diseno/spec.md#4-tabla-de-tokens
 
-#### 9.Matriz de Tokens
+### 9.Matriz de Tokens
+Esta matriz define qué token emite el analizador léxico al producirse una transición hacia un estado final (`-1`), en función del estado actual y del evento leído que disparó el cierre del token.
+- Un valor `-1` (o celda vacía) indica que en esa combinación no se produce cierre de token (es un estado intermedio que continúa en el autómata o un error).
+- `TK_ID*`: Si el identificador coincide con una palabra reservada, la acción semántica `f2` emitirá el token reservado correspondiente (`TK_INT`, `TK_REAL`, `TK_FUNCTION`, `TK_MAIN`, `TK_RETURN`, `TK_SWITCH`, `TK_CASE`, `TK_DEFAULT`, `TK_WHILE`, `TK_TOINT`, `TK_TOREAL`, `TK_AND`, `TK_OR`, `TK_ESCR`); de lo contrario emite `TK_ID` (314).
+- `0`: Representa el token `YYEOF` / Fin de Archivo (retorno 0 en `yylex()`).
 
+| Nombre de Estado | N° | LETRA (0) | DÍGITO (1) | = (2) | + (3) | - (4) | * (5) | / (6) | < (7) | > (8) | ! (9) | ( (10) | ) (11) | { (12) | } (13) | ; (14) | : (15) | . (16) | BLANCO (17) | FDA (18) | OTRO (19) |
+|:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| `estado inicial` | **E0** | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | 0 | -1 |
+| `palabra` | **E1** | -1 | -1 | 314 | 314 | 314 | 314 | 314 | 314 | 314 | 314 | 314 | 314 | 314 | 314 | 314 | 314 | 314 | 314 | 314 | 314 |
+| `entero` | **E2** | 315 | -1 | 315 | 315 | 315 | 315 | 315 | 315 | 315 | 315 | 315 | 315 | 315 | 315 | 315 | 315 | -1 | 315 | 315 | 315 |
+| `real` | **E3** | 316 | -1 | 316 | 316 | 316 | 316 | 316 | 316 | 316 | 316 | 316 | 316 | 316 | 316 | 316 | 316 | 316 | 316 | 316 | 316 |
+| `asigancion (=)` | **E4** | 317 | 317 | -1 | 317 | 317 | 317 | 317 | 317 | 317 | 317 | 317 | 317 | 317 | 317 | 317 | 317 | 317 | 317 | 317 | 317 |
+| `suma (+)` | **E5** | 318 | 318 | 318 | 318 | 318 | 318 | 318 | 318 | 318 | 318 | 318 | 318 | 318 | 318 | 318 | 318 | 318 | 318 | 318 | 318 |
+| `resta (-)` | **E6** | 319 | 319 | 319 | 319 | 319 | 319 | 319 | 319 | 319 | 319 | 319 | 319 | 319 | 319 | 319 | 319 | 319 | 319 | 319 | 319 |
+| `multiplicación (*)` | **E7** | 320 | 320 | 320 | 320 | 320 | 320 | 320 | 320 | 320 | 320 | 320 | 320 | 320 | 320 | 320 | 320 | 320 | 320 | 320 | 320 |
+| `división (/)` | **E8** | 321 | 321 | 321 | 321 | 321 | -1 | 321 | 321 | 321 | 321 | 321 | 321 | 321 | 321 | 321 | 321 | 321 | 321 | 321 | 321 |
+| `menor (< )` | **E9** | 322 | 322 | -1 | 322 | 322 | 322 | 322 | 322 | 322 | 322 | 322 | 322 | 322 | 322 | 322 | 322 | 322 | 322 | 322 | 322 |
+| `mayor (>)` | **E10** | 323 | 323 | -1 | 323 | 323 | 323 | 323 | 323 | 323 | 323 | 323 | 323 | 323 | 323 | 323 | 323 | 323 | 323 | 323 | 323 |
+| `menor o igual (<=)` | **E11** | 324 | 324 | 324 | 324 | 324 | 324 | 324 | 324 | 324 | 324 | 324 | 324 | 324 | 324 | 324 | 324 | 324 | 324 | 324 | 324 |
+| `mayor o igual (>=)` | **E12** | 325 | 325 | 325 | 325 | 325 | 325 | 325 | 325 | 325 | 325 | 325 | 325 | 325 | 325 | 325 | 325 | 325 | 325 | 325 | 325 |
+| `igualdad (==)` | **E13** | 326 | 326 | 326 | 326 | 326 | 326 | 326 | 326 | 326 | 326 | 326 | 326 | 326 | 326 | 326 | 326 | 326 | 326 | 326 | 326 |
+| `posible distinto` | **E14** | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
+| `distinto ( !=)` | **E15** | 327 | 327 | 327 | 327 | 327 | 327 | 327 | 327 | 327 | 327 | 327 | 327 | 327 | 327 | 327 | 327 | 327 | 327 | 327 | 327 |
+| `abre paréntesis` | **E16** | 328 | 328 | 328 | 328 | 328 | 328 | 328 | 328 | 328 | 328 | 328 | 328 | 328 | 328 | 328 | 328 | 328 | 328 | 328 | 328 |
+| `cierra paréntesis` | **E17** | 329 | 329 | 329 | 329 | 329 | 329 | 329 | 329 | 329 | 329 | 329 | 329 | 329 | 329 | 329 | 329 | 329 | 329 | 329 | 329 |
+| `llave apertura` | **E18** | 330 | 330 | 330 | 330 | 330 | 330 | 330 | 330 | 330 | 330 | 330 | 330 | 330 | 330 | 330 | 330 | 330 | 330 | 330 | 330 |
+| `llave cierre` | **E19** | 331 | 331 | 331 | 331 | 331 | 331 | 331 | 331 | 331 | 331 | 331 | 331 | 331 | 331 | 331 | 331 | 331 | 331 | 331 | 331 |
+| `fin sentencia (;)` | **E20** | 332 | 332 | 332 | 332 | 332 | 332 | 332 | 332 | 332 | 332 | 332 | 332 | 332 | 332 | 332 | 332 | 332 | 332 | 332 | 332 |
+| `separador (:)` | **E21** | 334 | 334 | 334 | 334 | 334 | 334 | 334 | 334 | 334 | 334 | 334 | 334 | 334 | 334 | 334 | 334 | 334 | 334 | 334 | 334 |
+| `comentario (/* )` | **E22** | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
+| `posible fin comentario`| **E23** | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
 
-#### 10. Errores que emite esta fase
+#### Tabla de Tokens:
+
+| Código | Nombre | Token | Lexema |
+| --- | --- | --- | --- |
+| 301 | TK_INT | tipo entero | `entero` |
+| 302 | TK_REAL | tipo real | `real` |
+| 303 | TK_FUNCTION | declaración de función | `funcion` |
+| 304 | TK_MAIN | bloque principal | `principal` |
+| 305 | TK_RETURN | retorno | `retornar` |
+| 306 | TK_SWITCH | segun | `segun` |
+| 307 | TK_CASE | caso | `caso` |
+| 308 | TK_DEFAULT | defecto | `defecto` |
+| 309 | TK_WHILE | mientras | `mientras` |
+| 310 | TK_TOINT | conversión a entero | `aEntero` |
+| 311 | TK_TOREAL | conversión a real | `aReal` |
+| 312 | TK_AND | conector lógico | `y` |
+| 313 | TK_OR | conector lógico | `o` |
+| 314 | TK_ID | identificador | letra (letra\|dígito\)* |
+| 315 | TK_NUM_INT | constante entera | dígito |
+| 316 | TK_NUM_REAL | constante real | dígito `.` dígito |
+| 317 | TK_ASSIGN | asignación | `=` |
+| 318 | TK_PLUS | suma | `+` |
+| 319 | TK_MINUS | resta | `-` |
+| 320 | TK_MULT | multiplicación | `*` |
+| 321 | TK_DIV | división | `/` |
+| 322 | TK_LT | menor | `<` |
+| 323 | TK_GT | mayor | `>` |
+| 324 | TK_LE | menor o igual | `<=` |
+| 325 | TK_GE | mayor o igual | `>=` |
+| 326 | TK_EQ | igual | `==` |
+| 327 | TK_NEQ | distinto | `!=` |
+| 328 | TK_LPAREN | paréntesis izquierda | `(` |
+| 329 | TK_RPAREN | paréntesis derecha | `)` |
+| 330 | TK_LBRACE | llave izquierda | `{` |
+| 331 | TK_RBRACE | llave derecha | `}` |
+| 332 | TK_SEMI | fin de sentencia | `;` |
+| 334 | TK_COLON | separador de etiqueta caso/defecto | `:` |
+| 335 | TK_ESCR | escribir |  `escribir` |
+| 337 | TK_OTRO | carácter no reconocido | error léxico |
+
+---
+### 10. Errores que emite esta fase
 
 | Código | Condición | Mensaje emitido | Recuperación |
 |:---:|:---|:---|:---|
@@ -226,7 +293,7 @@ diseno/spec.md#4-tabla-de-tokens
 
 --------------------------------------------------------------------------------
 
-#### 11. Traza de verificación
+### 11. Traza de verificación
 
 ##### Traza 1: Reconocimiento de identificador y operador `+` (`contador + 5`)
 | Paso | N° | Estado | Carácter leído | Evento | Acción | Nuevo estado | Unread | Token devuelto |
@@ -250,7 +317,7 @@ diseno/spec.md#4-tabla-de-tokens
 
 --------------------------------------------------------------------------------
 
-#### 12. Casos de prueba de esta fase
+### 12. Casos de prueba de esta fase
 
 | Entrada | Salida esperada | Qué verifica |
 |---|---|---|
