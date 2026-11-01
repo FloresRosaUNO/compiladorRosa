@@ -31,7 +31,7 @@ La función auxiliar `get_evento(int c)` mapea el carácter leído del archivo f
 
 | Col | Evento | Símbolo | Caracteres incluidos |
 |:---:|:---|:---:|:---|
-| **0** | Letra / Guion bajo | `L` | `a-z`, `A-Z`, `_` |
+| **0** | Letra  | `L` | `a-z`, `A-Z`, `_` |
 | **1** | Dígito | `D` | `0-9` |
 | **2** | Asignación / Igual | `=` | `=` |
 | **3** | Suma | `+` | `+` |
@@ -59,29 +59,29 @@ La función auxiliar `get_evento(int c)` mapea el carácter leído del archivo f
 | Estado | Tipo | Descripción |
 |:---:|:---:|:---|
 | **E0** | Inicial | Consume separadores o inicia el reconocimiento de lexemas. |
-| **E1** | En proceso | Leyendo identificador o palabra reservada. |
-| **E2** | En proceso | Leyendo constante entera. |
-| **E3** | En proceso | Leyendo parte decimal de una constante real (tras leer `.`). |
-| **E4** | En proceso | Leyó `=`; puede ser asignación `=` o pasar a igualdad `==`. |
-| **E5** | En proceso | Leyó `+`; cierre de token simple. |
-| **E6** | En proceso | Leyó `-`; cierre de token simple. |
-| **E7** | En proceso | Leyó `*`; cierre de token simple. |
-| **E8** | En proceso | Leyó `/`; puede ser división `/` o inicio de comentario `/*`. |
-| **E9** | En proceso | Leyó `<`; puede ser `<` o menor igual `<=`. |
-| **E10** | En proceso | Leyó `>`; puede ser `>` o mayor igual `>=`. |
-| **E11** | En proceso | Leyó `<=` (operador relacional compuesto). |
-| **E12** | En proceso | Leyó `>=` (operador relacional compuesto). |
-| **E13** | En proceso | Leyó `==` (operador relacional compuesto). |
-| **E14** | En proceso | Leyó `!`; espera obligatoriamente `=` para formar `!=`. |
-| **E15** | En proceso | Leyó `!=` (operador relacional compuesto). |
-| **E16** | En proceso | Leyó `(`; delimitador simple. |
-| **E17** | En proceso | Leyó `)`; delimitador simple. |
-| **E18** | En proceso | Leyó `{`; delimitador simple. |
-| **E19** | En proceso | Leyó `}`; delimitador simple. |
-| **E20** | En proceso | Leyó `;`; delimitador simple. |
+| **E1** | Palabra | Leyendo identificador o palabra reservada. |
+| **E2** | Número | Leyendo constante entera. |
+| **E3** | Real | Leyendo parte decimal de una constante real (tras leer `.`). |
+| **E4** | Asignación | Leyó `=`; puede ser asignación `=` o pasar a igualdad `==`. |
+| **E5** | Suma | Leyó `+`; cierre de token simple. |
+| **E6** | Resta | Leyó `-`; cierre de token simple. |
+| **E7** | Multiplicación | Leyó `*`; cierre de token simple. |
+| **E8** | División | Leyó `/`; puede ser división `/` o inicio de comentario `/*`. |
+| **E9** | Menor | Leyó `<`; puede ser `<` o menor igual `<=`. |
+| **E10** | Mayor| Leyó `>`; puede ser `>` o mayor igual `>=`. |
+| **E11** | Menor o igual | Leyó `<=` (operador relacional compuesto). |
+| **E12** | Mayor o igual | Leyó `>=` (operador relacional compuesto). |
+| **E13** | Asignación | Leyó `==` (operador relacional compuesto). |
+| **E14** | Posible Distinto | Leyó `!`; espera obligatoriamente `=` para formar `!=`. |
+| **E15** | Distinto | Leyó `!=` (operador relacional compuesto). |
+| **E16** | Paréntesis apertura | Leyó `(`; delimitador simple. |
+| **E17** | Paréntesis cierre| Leyó `)`; delimitador simple. |
+| **E18** | Llave apertura | Leyó `{`; delimitador simple. |
+| **E19** | Lave cierre | Leyó `}`; delimitador simple. |
+| **E20** | Delimitador | Leyó `;`; delimitador simple. |
 | **E21** | En proceso | Leyó `:`; delimitador simple. |
-| **E22** | En proceso | Dentro del cuerpo de comentario de bloque `/* ...`. |
-| **E23** | En proceso | Leyó `*` dentro del comentario; esperando `/` para cerrar bloque. |
+| **E22** | Comentario | Dentro del cuerpo de comentario de bloque `/* ...`. |
+| **E23** | Posible cierre comentario | Leyó `*` dentro del comentario; esperando `/` para cerrar bloque. |
 | **EF (-1)** | Final | Estado de aceptación. Determina el retorno de token hacia Bison. |
 
 --------------------------------------------------------------------------------
@@ -109,7 +109,7 @@ Gracias a la integración del control de longitud durante la acumulación y al u
 
 Valores: `0` a `23` para estados intermedios, `-1` para Estado Final de aceptación (`EF`).
 
-| Estado | L (0) | D (1) | = (2) | + (3) | - (4) | * (5) | / (6) | < (7) | > (8) | ! (9) | ( (10) | ) (11) | { (12) | } (13) | ; (14) | : (15) | . (16) | BL (17) | EOF (18) | OTRO (19) |
+| Estado | Letra (0) | Digito (1) | = (2) | + (3) | - (4) | * (5) | / (6) | < (7) | > (8) | ! (9) | ( (10) | ) (11) | { (12) | } (13) | ; (14) | : (15) | . (16) | BL (17) | EOF (18) | OTRO (19) |
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 | **E0** | 1 | 2 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 14 | 16 | 17 | 18 | 19 | 20 | 21 | -1 | 0 | -1 | 0 |
 | **E1** | 1 | 1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
@@ -140,7 +140,7 @@ Valores: `0` a `23` para estados intermedios, `-1` para Estado Final de aceptaci
 
 #### 7. Matriz de Acciones Semánticas (`acciones[24][20]`)
 
-| Estado | L (0) | D (1) | = (2) | + (3) | - (4) | * (5) | / (6) | < (7) | > (8) | ! (9) | ( (10) | ) (11) | { (12) | } (13) | ; (14) | : (15) | . (16) | BL (17) | EOF (18) | OTRO (19) |
+| Estado | Letra (0) | Dígito (1) | = (2) | + (3) | - (4) | * (5) | / (6) | < (7) | > (8) | ! (9) | ( (10) | ) (11) | { (12) | } (13) | ; (14) | : (15) | . (16) | BL (17) | EOF (18) | OTRO (19) |
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 | **E0** | f1 | f3 | f5 | f5 | f5 | f5 | f5 | f5 | f5 | f5 | f5 | f5 | f5 | f5 | f5 | f5 | fe | f6 | fn | fe |
 | **E1** | f1 | f1 | f2 | f2 | f2 | f2 | f2 | f2 | f2 | f2 | f2 | f2 | f2 | f2 | f2 | f2 | f2 | f2 | f2 | f2 |
@@ -173,7 +173,7 @@ Valores: `0` a `23` para estados intermedios, `-1` para Estado Final de aceptaci
 
 Un valor `1` indica que se debe reinsertar el carácter leído en el buffer de entrada con `ungetc(c, yyin)`. Un valor `0` indica que el carácter pertenece al token o fue consumido normalmente.
 
-| Estado | L (0) | D (1) | = (2) | + (3) | - (4) | * (5) | / (6) | < (7) | > (8) | ! (9) | ( (10) | ) (11) | { (12) | } (13) | ; (14) | : (15) | . (16) | BL (17) | EOF (18) | OTRO (19) |
+| Estado | Letra (0) | Dígito (1) | = (2) | + (3) | - (4) | * (5) | / (6) | < (7) | > (8) | ! (9) | ( (10) | ) (11) | { (12) | } (13) | ; (14) | : (15) | . (16) | BL (17) | EOF (18) | OTRO (19) |
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 | **E0** | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 | **E1 (ID)** | 0 | 0 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
@@ -208,26 +208,26 @@ Cuando el autómata alcanza un estado de aceptación `EF (-1)`, el token retorna
 
 | Estado previo | Token retornado | Código / Constante | Descripción |
 |:---:|:---:|:---:|:---|
-| **E1** | `TK_ID` o palabra reservada | `314` o `301..313, 335` | Identificador o palabra clave validada por `f2`. |
-| **E2** | `TK_NUM_INT` | `315` | Constante entera de 32 bits. |
-| **E3** | `TK_NUM_REAL` | `316` | Constante de punto flotante real. |
-| **E4** | `TK_ASSIGN` | `317` | Operador de asignación `=`. |
-| **E5** | `TK_PLUS` | `318` | Operador aritmético `+`. |
-| **E6** | `TK_MINUS` | `319` | Operador aritmético `-`. |
-| **E7** | `TK_MULT` | `320` | Operador aritmético `*`. |
-| **E8** | `TK_DIV` | `321` | Operador aritmético `/`. |
-| **E9** | `TK_LT` | `322` | Operador de comparación `<`. |
-| **E10** | `TK_GT` | `323` | Operador de comparación `>`. |
-| **E11** | `TK_LE` | `324` | Operador relacional `<=`. |
-| **E12** | `TK_GE` | `325` | Operador relacional `>=`. |
-| **E13** | `TK_EQ` | `326` | Operador relacional `==`. |
-| **E15** | `TK_NEQ` | `327` | Operador relacional `!=`. |
-| **E16** | `TK_LPAREN` | `328` | Delimitador `(`. |
-| **E17** | `TK_RPAREN` | `329` | Delimitador `)`. |
-| **E18** | `TK_LBRACE` | `330` | Delimitador `{`. |
-| **E19** | `TK_RBRACE` | `331` | Delimitador `}`. |
-| **E20** | `TK_SEMI` | `332` | Delimitador de fin de sentencia `;`. |
-| **E21** | `TK_COLON` | `334` | Separador de caso o defecto `:`. |
+| **E1** | `TK_ID` o palabra reservada | `314` o `301..313, 335` | Identificador o palabra reservada validada por `f2`. |
+| **E2** | `TK_NUM_ENT` | `315` | Constante entera de 32 bits. |
+| **E3** | `TK_NUM_REAL` | `316` | Constante real de 32 bits |
+| **E4** | `TK_ASIGN` | `317` | Operador de asignación `=`. |
+| **E5** | `TK_SUMA` | `318` | Operador aritmético suma `+`. |
+| **E6** | `TK_RESTA` | `319` | Operador aritmético resta `-`. |
+| **E7** | `TK_MULT` | `320` | Operador aritmético multiplicación `*`. |
+| **E8** | `TK_DIV` | `321` | Operador aritmético división `/`. |
+| **E9** | `TK_MENOR` | `322` | Operador de comparación menor `<`. |
+| **E10** | `TK_MAYOR` | `323` | Operador de comparación mayor `>`. |
+| **E11** | `TK_MENORIGUAL` | `324` | Operador relacional menor o igual `<=`. |
+| **E12** | `TK_MAYORIGUAL` | `325` | Operador relacional mayor o igual `>=`. |
+| **E13** | `TK_EQUIV` | `326` | Operador relacional asignación `==`. |
+| **E15** | `TK_DISTIN` | `327` | Operador relacional distinto `!=`. |
+| **E16** | `TK_ABREPAREN` | `328` | Delimitador `(`. |
+| **E17** | `TK_CIERRPAREN` | `329` | Delimitador `)`. |
+| **E18** | `TK_ABRELLAV` | `330` | Delimitador `{`. |
+| **E19** | `TK_CIERRLLAV` | `331` | Delimitador `}`. |
+| **E20** | `TK_FINSENTEN` | `332` | Delimitador de fin de sentencia `;`. |
+| **E21** | `TK_SEPACASO` | `334` | Separador de caso o defecto `:`. |
 | **E0 (con EOF)** | `0` (`YYEOF`) | `0` | Fin de archivo alcanzado correctamente en estado inicial. |
 
 --------------------------------------------------------------------------------
@@ -240,7 +240,7 @@ Cuando el autómata alcanza un estado de aceptación `EF (-1)`, el token retorna
 | **ERR_LEX_02** | Operador `!` seguido de un carácter distinto de `=`. | `Error léxico en línea %d: Carácter '!' inesperado. Se esperaba '=' para formar '!='.` | Se aplica unread sobre el delimitador, se reporta el error y vuelve a E0. |
 | **ERR_LEX_03** | Fin de archivo inesperado (`EOF`) dentro del cuerpo de un comentario multilínea `/* ...`. | `Error léxico: Fin de archivo inesperado. Comentario abierto en línea %d no fue cerrado.` | Se interrumpe la ejecución del analizador léxico reportando código de error. |
 | **ERR_LEX_04** | Constante entera fuera del rango representable de 32 bits (`[-2147483648, 2147483647]`). | `Error léxico en línea %d: Constante entera '%s' fuera de rango (32 bits con signo).` | Se almacena el valor saturado o truncado y se continúa el análisis. |
-| **WARN_LEX_01** | Identificador que excede el límite de 20 caracteres. | `Warning léxico en línea %d: Identificador '%s' supera el límite de 20 caracteres. Se truncará a '%s'.` | El identificador se trunca en la acumulación a 20 caracteres y se almacena truncado en la TS. |
+| **ATENCION_LEX_01** | Identificador que excede el límite de 20 caracteres. | `Atención léxico en línea %d: Identificador '%s' supera el límite de 20 caracteres. Se truncará a '%s'.` | El identificador se trunca en la acumulación a 20 caracteres y se almacena truncado en la Tabla de Simbolos. |
 
 --------------------------------------------------------------------------------
 
