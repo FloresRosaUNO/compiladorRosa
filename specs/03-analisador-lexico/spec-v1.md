@@ -1,5 +1,7 @@
 # Spec — Analizador léxico de DUOTIPO
 
+Grupo: E · Lenguaje de implementación: C Depende de: specs/01-diseno/spec.md Produce: src/lexicoV6/
+
 ## 1. Alcance e interfaz
 
 Función `yylex()` invocada por el analizador sintáctico. Devuelve **un token por
@@ -9,7 +11,10 @@ produzca la lista completa.
 ## 2. Decisiones propias de esta fase
 
 | # | Decisión | Valor |
-|---|---|---|
+| L1 | PALABRAS RESERVADAS | En el estado E1, tras la lectura de caracteres y con accion de f? se busca en el diccionario de palabras resevadas. Si no se encuentra en el mencionado, devuelve como ID y en adjuntado a la taba de símbolos. |
+| L2	| Límite de longitud de ID | Máximo 20 caracteres (validado en f3). Si supera los 20 caracteres, emite un Warning Léxico con el número de línea. |
+| L3 | Comentarios y blancos	| Los espacios, tabulaciones, saltos de línea y comentarios de bloque /* ... */ (estados E8, E22 y E23) son consumidos y descartados por el autómata volviendo al estado 0 sin emitir ningún token. |
+| L4 |	Retroceso de carácter (Unread) |	Se controla mediante MATRIZ_UNREADS: cuando vale 1, se retrocede una posición el cursor (_unread_char) para no perder el carácter delimitador que cerró el token. |
 
 ---
 
