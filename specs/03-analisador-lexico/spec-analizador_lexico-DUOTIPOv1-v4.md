@@ -31,8 +31,8 @@ La función auxiliar `get_evento(int c)` mapea el carácter leído del archivo f
 
 | Col | Evento | Símbolo | Caracteres incluidos |
 |:---:|:---|:---:|:---|
-| **0** | Letra | `letra` | `a-z`, `A-Z` |
-| **1** | Dígito | `digito` | `0-9` |
+| **0** | Letra | `LETRA` | `a-z`, `A-Z` |
+| **1** | Dígito | `DÍGITO` | `0-9` |
 | **2** | Asignación / Igual | `=` | `=` |
 | **3** | Suma | `+` | `+` |
 | **4** | Resta | `-` | `-` |
@@ -48,8 +48,8 @@ La función auxiliar `get_evento(int c)` mapea el carácter leído del archivo f
 | **14** | Punto y coma | `;` | `;` |
 | **15** | Dos puntos | `:` | `:` |
 | **16** | Punto decimal | `.` | `.` |
-| **17** | Blanco / Separador | `BL` | Espacio (`' '`), tabulación (`'\t'`), `\r`, `\n` |
-| **18** | Fin de archivo | `EOF` | Carácter `EOF` (`-1`) |
+| **17** | Blanco / Separador | `BLANCO` | Espacio (`' '`), tabulación (`'\t'`), `\r`, `\n` |
+| **18** | Fin de archivo | `FDA` | Carácter `FDA` (`-1`) |
 | **19** | No reconocido | `OTRO` | Cualquier otro carácter fuera del alfabeto de DUOTIPO |
 
 --------------------------------------------------------------------------------
@@ -96,7 +96,39 @@ La función auxiliar `get_evento(int c)` mapea el carácter leído del archivo f
 
 --------------------------------------------------------------------------------
 
-#### 5. Acciones semánticas
+#### 5. Matriz de Nuevos Estados (`nuevo_estado[24][20]`)
+
+Valores: `0` a `23` para estados intermedios, `-1` para Estado Final de aceptación (`EF`).
+
+| Nombre de Estado | N° | LETRA (0) | DÍGITO (1) | = (2) | + (3) | - (4) | * (5) | / (6) | < (7) | > (8) | ! (9) | ( (10) | ) (11) | { (12) | } (13) | ; (14) | : (15) | . (16) | BLANCO (17) | FDA (18) | OTRO (19) |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| `Estado inicial` | **E0** | 1 | 2 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 14 | 16 | 17 | 18 | 19 | 20 | 21 | -1 | 0 | -1 | 0 |
+| `palabra` | **E1** | 1 | 1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
+| `entero` | **E2** | -1 | 2 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | 3 | -1 | -1 | -1 |
+| `real` | **E3** | -1 | 3 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
+| `asigancion (=)` | **E4** | -1 | -1 | 13 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
+| `suma (+)` | **E5** | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
+| `resta (-)` | **E6** | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
+| `multiplicación (*)` | **E7** | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
+| `división (/)` | **E8** | -1 | -1 | -1 | -1 | -1 | 22 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
+| `menor (< )` | **E9** | -1 | -1 | 11 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
+| `mayor (>)` | **E10** | -1 | -1 | 12 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
+| `menor o igual (<=)` | **E11** | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
+| `mayor o igual (>=)` | **E12** | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
+| `igualdad (==)` | **E13** | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
+| `posible distinto` | **E14** | -1 | -1 | 15 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
+| `distinto ( !=)` | **E15** | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
+| `abre paréntesis` | **E16** | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
+| `cierra paréntesis` | **E17** | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
+| `llave apertura` | **E18** | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
+| `llave cierre` | **E19** | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
+| `fin sentencia (;)` | **E20** | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
+| `separador (:)` | **E21** | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
+| `comentario (/* )` | **E22** | 22 | 22 | 22 | 22 | 22 | 23 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | -1 | 22 |
+| `posible fin comentario` | **E23** | 22 | 22 | 22 | 22 | 22 | 23 | 0 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | -1 | 22 |
+
+---
+#### 6. Acciones semánticas
 
 | Acción | Nombre de función | Qué hace |
 |:---:|:---:|:---|
@@ -111,106 +143,78 @@ La función auxiliar `get_evento(int c)` mapea el carácter leído del archivo f
 | **f8** | `f_fin_coment` | Concluye el comentario de bloque y limpia banderas de comentario. |
 | **fe** | `f_error_lexico` | Registra y emite un mensaje de error léxico con número de línea actual y descripción del motivo. |
 
---------------------------------------------------------------------------------
-
-#### 6. Matriz de Nuevos Estados (`nuevo_estado[24][20]`)
-
-Valores: `0` a `23` para estados intermedios, `-1` para Estado Final de aceptación (`EF`).
-
-| N° | Nombre de Estado | letra (0) | digito (1) | = (2) | + (3) | - (4) | * (5) | / (6) | < (7) | > (8) | ! (9) | ( (10) | ) (11) | { (12) | } (13) | ; (14) | : (15) | . (16) | BL (17) | EOF (18) | OTRO (19) |
-|:---:|:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| **0** | `estado inicial` | 1 | 2 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 14 | 16 | 17 | 18 | 19 | 20 | 21 | -1 | 0 | -1 | 0 |
-| **1** | `palabra` | 1 | 1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
-| **2** | `entero` | -1 | 2 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | 3 | -1 | -1 | -1 |
-| **3** | `real` | -1 | 3 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
-| **4** | `asigancion (=)` | -1 | -1 | 13 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
-| **5** | `suma (+)` | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
-| **6** | `resta (-)` | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
-| **7** | `multiplicación (*)` | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
-| **8** | `división (/)` | -1 | -1 | -1 | -1 | -1 | 22 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
-| **9** | `menor (< )` | -1 | -1 | 11 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
-| **10** | `mayor (>)` | -1 | -1 | 12 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
-| **11** | `menor o igual (<=)` | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
-| **12** | `mayor o igual (>=)` | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
-| **13** | `igualdad (==)` | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
-| **14** | `posible distinto` | -1 | -1 | 15 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
-| **15** | `distinto ( !=)` | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
-| **16** | `abre paréntesis` | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
-| **17** | `cierra paréntesis` | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
-| **18** | `llave apertura` | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
-| **19** | `llave cierre` | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
-| **20** | `fin sentencia (;)` | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
-| **21** | `separador (:)` | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
-| **22** | `comentario (/* )` | 22 | 22 | 22 | 22 | 22 | 23 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | -1 | 22 |
-| **23** | `posible fin comentario` | 22 | 22 | 22 | 22 | 22 | 23 | 0 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | -1 | 22 |
-
---------------------------------------------------------------------------------
 
 #### 7. Matriz de Acciones Semánticas (`acciones[24][20]`)
 
-| N° | Nombre de Estado | letra (0) | digito (1) | = (2) | + (3) | - (4) | * (5) | / (6) | < (7) | > (8) | ! (9) | ( (10) | ) (11) | { (12) | } (13) | ; (14) | : (15) | . (16) | BL (17) | EOF (18) | OTRO (19) |
-|:---:|:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| **0** | `estado inicial` | f1 | f3 | f5 | f5 | f5 | f5 | f5 | f5 | f5 | f5 | f5 | f5 | f5 | f5 | f5 | f5 | fe | f6 | fn | fe |
-| **1** | `palabra` | f1 | f1 | f2 | f2 | f2 | f2 | f2 | f2 | f2 | f2 | f2 | f2 | f2 | f2 | f2 | f2 | f2 | f2 | f2 | f2 |
-| **2** | `entero` | f4 | f3 | f4 | f4 | f4 | f4 | f4 | f4 | f4 | f4 | f4 | f4 | f4 | f4 | f4 | f4 | f3 | f4 | f4 | f4 |
-| **3** | `real` | f4 | f3 | f4 | f4 | f4 | f4 | f4 | f4 | f4 | f4 | f4 | f4 | f4 | f4 | f4 | f4 | f4 | f4 | f4 | f4 |
-| **4** | `asigancion (=)` | fn | fn | f5 | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn |
-| **5** | `suma (+)` | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn |
-| **6** | `resta (-)` | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn |
-| **7** | `multiplicación (*)` | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn |
-| **8** | `división (/)` | fn | fn | fn | fn | fn | f7 | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn |
-| **9** | `menor (< )` | fn | fn | f5 | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn |
-| **10** | `mayor (>)` | fn | fn | f5 | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn |
-| **11** | `menor o igual (<=)` | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn |
-| **12** | `mayor o igual (>=)` | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn |
-| **13** | `igualdad (==)` | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn |
-| **14** | `posible distinto` | fe | fe | f5 | fe | fe | fe | fe | fe | fe | fe | fe | fe | fe | fe | fe | fe | fe | fe | fe | fe |
-| **15** | `distinto ( !=)` | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn |
-| **16** | `abre paréntesis` | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn |
-| **17** | `cierra paréntesis` | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn |
-| **18** | `llave apertura` | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn |
-| **19** | `llave cierre` | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn |
-| **20** | `fin sentencia (;)` | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn |
-| **21** | `separador (:)` | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn |
-| **22** | `comentario (/* )` | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | f6 | fe | fn |
-| **23** | `posible fin comentario` | fn | fn | fn | fn | fn | fn | f8 | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | f6 | fe | fn |
+| Nombre de Estado | N° | LETRA (0) | DÍGITO (1) | = (2) | + (3) | - (4) | * (5) | / (6) | < (7) | > (8) | ! (9) | ( (10) | ) (11) | { (12) | } (13) | ; (14) | : (15) | . (16) | BLANCO (17) | FDA (18) | OTRO (19) |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| `estado inicial` | **E0** | f1 | f3 | f5 | f5 | f5 | f5 | f5 | f5 | f5 | f5 | f5 | f5 | f5 | f5 | f5 | f5 | fe | f6 | fn | fe |
+| `palabra` | **E1** | f1 | f1 | f2 | f2 | f2 | f2 | f2 | f2 | f2 | f2 | f2 | f2 | f2 | f2 | f2 | f2 | f2 | f2 | f2 | f2 |
+| `entero` | **E2** | f4 | f3 | f4 | f4 | f4 | f4 | f4 | f4 | f4 | f4 | f4 | f4 | f4 | f4 | f4 | f4 | f3 | f4 | f4 | f4 |
+| `real` | **E3** | f4 | f3 | f4 | f4 | f4 | f4 | f4 | f4 | f4 | f4 | f4 | f4 | f4 | f4 | f4 | f4 | f4 | f4 | f4 | f4 |
+| `asigancion (=)` | **E4** | fn | fn | f5 | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn |
+| `suma (+)` | **E5** | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn |
+| `resta (-)` | **E6** | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn |
+| `multiplicación (*)` | **E7** | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn |
+| `división (/)` | **E8** | fn | fn | fn | fn | fn | f7 | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn |
+| `menor (< )` | **E9** | fn | fn | f5 | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn |
+| `mayor (>)` | **E10** | fn | fn | f5 | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn |
+| `menor o igual (<=)` | **E11** | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn |
+| `mayor o igual (>=)` | **E12** | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn |
+| `igualdad (==)` | **E13** | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn |
+| `posible distinto` | **E14** | fe | fe | f5 | fe | fe | fe | fe | fe | fe | fe | fe | fe | fe | fe | fe | fe | fe | fe | fe | fe |
+| `distinto ( !=)` | **E15** | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn |
+| `abre paréntesis` | **E16** | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn |
+| `cierra paréntesis` | **E17** | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn |
+| `llave apertura` | **E18** | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn |
+| `llave cierre` | **E19** | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn |
+| `fin sentencia (;)` | **E20** | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn |
+| `separador (:)` | **E21** | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn |
+| `comentario (/* )` | **E22** | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | f6 | fe | fn |
+| `posible fin comentario` | **E23** | fn | fn | fn | fn | fn | fn | f8 | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | f6 | fe | fn |
 
---------------------------------------------------------------------------------
+---
 
 #### 8. Tabla de Unreads (`unreads[24][20]`)
 
 Un valor `1` indica que se debe reinsertar el carácter leído en el buffer de entrada con `ungetc(c, yyin)`. Un valor `0` indica que el carácter pertenece al token o fue consumido normalmente.
 
-| N° | Nombre de Estado | letra (0) | digito (1) | = (2) | + (3) | - (4) | * (5) | / (6) | < (7) | > (8) | ! (9) | ( (10) | ) (11) | { (12) | } (13) | ; (14) | : (15) | . (16) | BL (17) | EOF (18) | OTRO (19) |
-|:---:|:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| **0** | `estado inicial` | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| **1** | `palabra` | 0 | 0 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
-| **2** | `entero` | 1 | 0 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 | 0 | 1 |
-| **3** | `real` | 1 | 0 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
-| **4** | `asigancion (=)` | 1 | 1 | 0 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
-| **5** | `suma (+)` | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
-| **6** | `resta (-)` | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
-| **7** | `multiplicación (*)` | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
-| **8** | `división (/)` | 1 | 1 | 1 | 1 | 1 | 0 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
-| **9** | `menor (< )` | 1 | 1 | 0 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
-| **10** | `mayor (>)` | 1 | 1 | 0 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
-| **11** | `menor o igual (<=)` | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
-| **12** | `mayor o igual (>=)` | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
-| **13** | `igualdad (==)` | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
-| **14** | `posible distinto` | 1 | 1 | 0 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
-| **15** | `distinto ( !=)` | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
-| **16** | `abre paréntesis` | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
-| **17** | `cierra paréntesis` | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
-| **18** | `llave apertura` | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
-| **19** | `llave cierre` | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
-| **20** | `fin sentencia (;)` | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
-| **21** | `separador (:)` | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
-| **22** | `comentario (/* )` | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| **23** | `posible fin comentario` | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| Nombre de Estado | N° | LETRA (0) | DÍGITO (1) | = (2) | + (3) | - (4) | * (5) | / (6) | < (7) | > (8) | ! (9) | ( (10) | ) (11) | { (12) | } (13) | ; (14) | : (15) | . (16) | BLANCO (17) | FDA (18) | OTRO (19) |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| `estado inicial` | **E0** | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `palabra` | **1** | 0 | 0 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
+| `entero` | **E2** | 1 | 0 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 | 0 | 1 |
+| `real` | **E3** | 1 | 0 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
+| `asigancion (=)` | **E4** | 1 | 1 | 0 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
+| `suma (+)` | **E5** | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
+| `resta (-)` | **E6** | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
+| `multiplicación (*)` | **E7** | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
+| `división (/)` | **E8** | 1 | 1 | 1 | 1 | 1 | 0 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
+| `menor (< )` | **E9** | 1 | 1 | 0 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
+| `mayor (>)` | **E10** | 1 | 1 | 0 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
+| `menor o igual (<=)` | **E11** | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
+| `mayor o igual (>=)` | **E12** | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
+| `igualdad (==)` | **E13** | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
+| `posible distinto` | **E14** | 1 | 1 | 0 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
+| `distinto ( !=)` | **E15** | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
+| `abre paréntesis` | **E16** | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
+| `cierra paréntesis` | **E17** | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
+| `llave apertura` | **E18** | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
+| `llave cierre` | **E19** | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
+| `fin sentencia (;)` | **E20** | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
+| `separador (:)` | **E21** | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 |
+| `comentario (/* )` | **E22** | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `posible fin comentario` | **E23** | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 
 --------------------------------------------------------------------------------
+Tabla de Tokens:
+https://github.com/martinzwaryczz/compiladores-2026/blob/main/specs/01-
+diseno/spec.md#4-tabla-de-tokens
 
-#### 9. Errores que emite esta fase
+#### 9.Matriz de Tokens
+
+
+#### 10. Errores que emite esta fase
 
 | Código | Condición | Mensaje emitido | Recuperación |
 |:---:|:---|:---|:---|
@@ -218,11 +222,11 @@ Un valor `1` indica que se debe reinsertar el carácter leído en el buffer de e
 | **ERR_LEX_02** | Operador `!` seguido de un carácter distinto de `=`. | `Error léxico en línea %d: Carácter '!' inesperado. Se esperaba '=' para formar '!='.` | Se aplica unread sobre el delimitador, se reporta el error y vuelve a E0. |
 | **ERR_LEX_03** | Fin de archivo inesperado (`EOF`) dentro del cuerpo de un comentario multilínea `/* ...`. | `Error léxico: Fin de archivo inesperado. Comentario abierto en línea %d no fue cerrado.` | Se interrumpe la ejecución del analizador léxico reportando código de error. |
 | **ERR_LEX_04** | Constante entera fuera del rango representable de 32 bits (`[-2147483648, 2147483647]`). | `Error léxico en línea %d: Constante entera '%s' fuera de rango (32 bits con signo).` | Se almacena el valor saturado o truncado y se continúa el análisis. |
-| **WARN_LEX_01** | Identificador que excede el límite de 20 caracteres. | `Warning léxico en línea %d: Identificador '%s' supera el límite de 20 caracteres. Se truncará a '%s'.` | El identificador se trunca a 20 caracteres y se almacena truncado en la TS. |
+| **ADVER_LEX_01** | Identificador que excede el límite de 20 caracteres. | `Advertencia léxica en línea %d: Identificador '%s' supera el límite de 20 caracteres. Se truncará a '%s'.` | El identificador se trunca a 20 caracteres y se almacena truncado en la Tabla de Simbolos. |
 
 --------------------------------------------------------------------------------
 
-#### 10. Traza de verificación
+#### 11. Traza de verificación
 
 ##### Traza 1: Reconocimiento de identificador y operador `+` (`contador + 5`)
 | Paso | N° | Estado | Carácter leído | Evento | Acción | Nuevo estado | Unread | Token devuelto |
@@ -246,7 +250,7 @@ Un valor `1` indica que se debe reinsertar el carácter leído en el buffer de e
 
 --------------------------------------------------------------------------------
 
-#### 11. Casos de prueba de esta fase
+#### 12. Casos de prueba de esta fase
 
 | Entrada | Salida esperada | Qué verifica |
 |---|---|---|
