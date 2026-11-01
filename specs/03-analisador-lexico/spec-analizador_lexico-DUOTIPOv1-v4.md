@@ -1,10 +1,10 @@
 ## Spec — Analizador léxico de DUOTIPO
-**Grupo:** E · **Lenguaje de implementación:** C · **Depende de:** specs/01-diseno/specDUOTIPO1.md · **Produce:** src/lexer.c/ · escribe en la tabla de símbolos definida en specs/02-tabla-simbolos/spec.md
+**Grupo:** E · **Lenguaje de implementación:** C · **Depende de:** specs/01-diseno/spec.md · **Produce:** src/lexer.c/  y escribe en la tabla de símbolos definida en specs/02-tabla-simbolos/spec.md
 
 --------------------------------------------------------------------------------
 
 ### 1. Alcance e interfaz
-Función `yylex()` invocada por el analizador sintáctico (GNU Bison). Devuelve **un token por llamada**, como entero representativo del tipo de token (constantes `TK_*` o códigos definidos por Bison). No genera una pasada previa que devuelva una lista de tokens; el flujo es guiado por demanda.
+Función `yylex()` invocada por el analizador sintáctico (GNU Bison). Devuelve **un token por llamada**, como entero representativo del tipo de token (constantes `TK_*` o códigos definidos por Bison). No genera una pasada previa que devuelva una lista de tokens. El flujo es guiado por demanda.
 
 ```c
 int yylex(void);
@@ -93,7 +93,7 @@ La función auxiliar `get_evento(int c)` mapea el carácter leído del archivo f
 | **EF (-1)** | Estado final; cierre de token y consulta a matriz de tokens |
   
 </center>
----
+
 
 ### 5. Matriz de Nuevos Estados (`nuevo_estado[24][20]`)
 
@@ -126,7 +126,7 @@ Valores: `0` a `23` para estados intermedios, `-1` para Estado Final de aceptaci
 | `comentario (/* )` | **E22** | 22 | 22 | 22 | 22 | 22 | 23 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | -1 | 22 |
 | `posible fin comentario` | **E23** | 22 | 22 | 22 | 22 | 22 | 23 | 0 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | -1 | 22 |
 
----
+--------------------------------------------------------------------------------
 ### 6. Acciones semánticas
 
 | Acción | Nombre de función | Qué hace |
@@ -172,7 +172,7 @@ Valores: `0` a `23` para estados intermedios, `-1` para Estado Final de aceptaci
 | `comentario (/* )` | **E22** | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | f6 | fe | fn |
 | `posible fin comentario` | **E23** | fn | fn | fn | fn | fn | fn | f8 | fn | fn | fn | fn | fn | fn | fn | fn | fn | fn | f6 | fe | fn |
 
----
+--------------------------------------------------------------------------------
 
 ### 8. Tabla de Unreads (`unreads[24][20]`)
 
@@ -240,7 +240,7 @@ Esta matriz define qué token emite el analizador léxico al producirse una tran
 | `comentario (/* )` | **E22** | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
 | `posible fin comentario`| **E23** | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 | -1 |
 
-#### Tabla de Tokens:
+#### .Tabla de Tokens:
 
 | Código | Nombre | Token | Lexema |
 | --- | --- | --- | --- |
@@ -280,7 +280,7 @@ Esta matriz define qué token emite el analizador léxico al producirse una tran
 | 335 | TK_ESCR | escribir |  `escribir` |
 | 337 | TK_OTRO | carácter no reconocido | error léxico |
 
----
+--------------------------------------------------------------------------------
 ### 10. Errores que emite esta fase
 
 | Código | Condición | Mensaje emitido | Recuperación |
@@ -322,7 +322,7 @@ Esta matriz define qué token emite el analizador léxico al producirse una tran
 | Entrada | Salida esperada | Qué verifica |
 |---|---|---|
 | `entero var_1 = 45;` | `TK_INT`, `TK_ID("var_1")`, `TK_ASSIGN`, `TK_NUM_INT(45)`, `TK_SEMI` | Identificadores válidos, palabras reservadas y constantes enteras. |
-| `identificador_demasiado_largo_para_el_lenguaje = 10;` | *Warning léxico en línea 1* (truncado a 20 caracteres) + `TK_ID("identificador_demas")`, `TK_ASSIGN`, `TK_NUM_INT(10)`, `TK_SEMI` | Límite máximo de longitud de identificadores (L2). |
+| `identificador_demasiado_largo_para_el_lenguaje = 10;` | *Advertencia léxica en línea 1* (truncado a 20 caracteres) + `TK_ID("identificador_demas")`, `TK_ASSIGN`, `TK_NUM_INT(10)`, `TK_SEMI` | Límite máximo de longitud de identificadores (L2). |
 | `a <= b y c != d;` | `TK_ID("a")`, `TK_LE`, `TK_ID("b")`, `TK_AND`, `TK_ID("c")`, `TK_NEQ`, `TK_ID("d")`, `TK_SEMI` | Operadores relacionales compuestos y conectores lógicos reservados. |
 | `/* bloque sin cerrar` | *Error léxico: Fin de archivo inesperado. Comentario abierto en línea 1 no fue cerrado.* | Manejo correcto de EOF dentro de comentarios sin pasar al parser sintáctico. |
 | `!a` | *Error léxico en línea 1: Carácter '!' inesperado* + `TK_ID("a")` | Manejo de exclamación no seguida de igual. |
