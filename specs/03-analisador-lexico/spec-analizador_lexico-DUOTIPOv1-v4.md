@@ -31,7 +31,7 @@ La función auxiliar `get_evento(int c)` mapea el carácter leído del archivo f
 
 | Col | Evento | Símbolo | Caracteres incluidos |
 |:---:|:---|:---:|:---|
-| **0** | Letra / Guion bajo | `letra` | `a-z`, `A-Z`, `_` |
+| **0** | Letra | `letra` | `a-z`, `A-Z` |
 | **1** | Dígito | `digito` | `0-9` |
 | **2** | Asignación / Igual | `=` | `=` |
 | **3** | Suma | `+` | `+` |
@@ -56,33 +56,43 @@ La función auxiliar `get_evento(int c)` mapea el carácter leído del archivo f
 
 #### 4. Estados y Diagrama
 
-| Estado | Nombre / Mnemónico en `.h` | Significado / Descripción |
-|:---:|:---|:---|
-| **E0** | `EST_INICIAL` | estado inicial |
-| **E1** | `EST_ID` | palabra (identificador o palabra reservada) |
-| **E2** | `EST_ENTERO` | entero (parte entera) |
-| **E3** | `EST_REAL` | real (parte decimal tras leer punto) |
-| **E4** | `EST_ASIG` | asignacion (=) |
-| **E5** | `EST_SUMA` | suma (+) |
-| **E6** | `EST_RESTA` | resta (-) |
-| **E7** | `EST_MULT` | multiplicación (*) |
-| **E8** | `EST_DIV` | división (/) |
-| **E9** | `EST_MENOR` | menor (<) |
-| **E10** | `EST_MAYOR` | mayor (>) |
-| **E11** | `EST_MENOR_IGUAL` | menor o igual (<=) |
-| **E12** | `EST_MAYOR_IGUAL` | mayor o igual (>=) |
-| **E13** | `EST_IGUALDAD` | igualdad (==) |
-| **E14** | `EST_POSIBLE_DIST` | posible distinto (!) |
-| **E15** | `EST_DISTINTO` | distinto (!=) |
-| **E16** | `EST_PAREN_ABRE` | abre paréntesis (() |
-| **E17** | `EST_PAREN_CIERRA` | cierra paréntesis ()) |
-| **E18** | `EST_LLAVE_ABRE` | llave apertura ({) |
-| **E19** | `EST_LLAVE_CIERRA` | llave cierre (}) |
-| **E20** | `EST_FIN_SENT` | fin sentencia (;) |
-| **E21** | `EST_SEPARADOR` | separador (:) |
-| **E22** | `EST_COMENTARIO` | comentario (/* cuerpo) |
-| **E23** | `EST_POSIBLE_FIN_COMENT` | posible fin comentario (*) |
-| **EF (-1)** | `EST_FINAL` | estado final de aceptación (retorna token hacia Bison) |
+## 4. Estados y Diagrama
+
+<img width="2691" height="1493" alt="AUTOMATA_COMPILADORES-DuoTipo v 4 drawio" src="https://github.com/user-attachments/assets/c8984f60-dc39-49d6-b46b-d777bca5dc32" />
+
+---
+<center>
+  
+| Estado | Significado |
+|---|---|
+| **E0** | Estado inicial; consume blancos o inicia el reconocimiento de tokens |
+| **E1** | Reconociendo Identificador o Palabra Reservada |
+| **E2** | Reconociendo Constante Entera |
+| **E3** | Reconociendo Constante Real (tras leer parte entera y `.`) |
+| **E4** | Tras leer `=`; puede ser asignación `=` o pasar a `==` |
+| **E5** | Operador aritmético suma `+` |
+| **E6** | Operador aritmético resta `-` |
+| **E7** | Operador aritmético multiplicación `*` |
+| **E8** | Tras leer `/`; puede ser división `/` o inicio de comentario `/*` |
+| **E9** | Tras leer `<`; puede ser menor `<` o menor o igual `<=` |
+| **E10** | Tras leer `>`; puede ser mayor `>` o mayor o igual `>=` |
+| **E11** | Operador relacional menor o igual `<=` |
+| **E12** | Operador relacional mayor o igual `>=` |
+| **E13** | Operador relacional igualdad `==` |
+| **E14** | Tras leer `!`; espera `=` para formar `!=` |
+| **E15** | Operador relacional desigualdad `!=` |
+| **E16** | Delimitador paréntesis izquierdo `(` |
+| **E17** | Delimitador paréntesis derecho `)` |
+| **E18** | Delimitador llave izquierda `{` |
+| **E19** | Delimitador llave derecha `}` |
+| **E20** | Delimitador fin de sentencia `;` |
+| **E21** | Delimitador dos puntos `:` |
+| **E22** | Dentro de cuerpo de comentario multilínea `/* ...` |
+| **E23** | Posible fin de comentario (leyó `*` dentro de comentario, esperando `/`) |
+| **EF (-1)** | Estado final; cierre de token y consulta a matriz de tokens |
+  
+</center>
+---
 
 --------------------------------------------------------------------------------
 
