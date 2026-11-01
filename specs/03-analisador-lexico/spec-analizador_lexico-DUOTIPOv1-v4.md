@@ -1,5 +1,5 @@
 ### Spec — Analizador léxico de DUOTIPO
-**Grupo:** E · **Lenguaje de implementación:** C · **Depende de:** specs/01-diseno/specDUOTIPO1.md · **Produce:** src/lexico/ · escribe en la tabla de símbolos definida en specs/02-tabla-simbolos/spec.md
+**Grupo:** E · **Lenguaje de implementación:** C · **Depende de:** specs/01-diseno/specDUOTIPO1.md · **Produce:** src/lexer.c/ · escribe en la tabla de símbolos definida en specs/02-tabla-simbolos/spec.md
 
 --------------------------------------------------------------------------------
 
