@@ -6,7 +6,7 @@
 #include "matriz_tokens.h"
 #include "matriz_acciones.h"
 #include "matriz_unreads.h"
-#include "tabla_simbolos.h"
+#include "/tabla_simbolos/tabla_simbolos.h"
 
 #define MAX_BUFFER_LEXICO 1024
 #define LIMITE_LONGITUD_ID 20
