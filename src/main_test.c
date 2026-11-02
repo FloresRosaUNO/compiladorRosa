@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "lexer.h"
+#include "/lexico/lexer.h"
 
 static const char *obtener_nombre_token(int token) {
     switch (token) {
