@@ -3,9 +3,7 @@
 | Fecha | Quién | Qué se hizo / decidió | Notas |
 |-------|-------|-----------------------|-------|
 |       |       |                       |       |
-Aquí tienes la **bitácora de trabajo** detallando todo lo realizado en la sesión de hoy, estructurada de forma clara para que puedas documentarla directamente en tus entregables o en la carpeta `docs/` de tu repositorio:
 
----
 
 # Bitácora de Trabajo — Analizador Léxico DUOTIPO
 **Fecha:** 1 de noviembre de 2026  
